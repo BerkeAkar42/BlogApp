@@ -13,7 +13,7 @@ namespace Repositories.Contracts
 
         Task AddAsync(Blog blog);
 
-        Task RemoveAsync(Guid id);
+        Task DeleteAsync(Guid id);
 
         Task UpdateAsync(Blog blog);
 

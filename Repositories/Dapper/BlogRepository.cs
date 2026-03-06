@@ -1,4 +1,6 @@
-﻿using Entities.Models;
+﻿using Dapper;
+using Entities.Models;
+using Microsoft.Data.SqlClient;
 using Repositories.Contracts;
 using System;
 using System.Collections.Generic;
@@ -10,32 +12,73 @@ namespace Repositories.Dapper
 {
     public class BlogRepository : IBlogRepository
     {
+        private readonly string _connectionString;
+
+        public BlogRepository(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
+
+
 
         // var veriler = await depo.tümünüGetir();
         //Bu await, veriler gelene kadar bekle ve veriler e ata.
 
-        public Task AddAsync(Blog blog)
+
+
+        // INSERT: Yeni blog ekleme
+        public async Task AddAsync(Blog blog)
         {
-            //Burada sadece veritabanına veri ekleme (INSERT) kodu olacak
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                const string sql = @"INSERT INTO Blog (BlogId, Title, Description, Content, ImageUrl, CategoryId, CreateDate, Slug, IsPublished) VALUES (@BlogId, @Title, @Description, Content, @ImageUrl, @CategoryId, @CreateDate, @Slug, @IsPublished)";
+
+
+                // Dapper, 'blog' nesnesindeki property isimlerini otomatik olarak '@' parametreleriyle eşleştirir.
+                await connection.ExecuteAsync(sql,blog);
+            }
         }
 
-        public Task<List<Blog>> GetAllAsync()
+
+
+
+        // SELECT: Tüm blogları listeleme
+        public async Task<List<Blog>> GetAllAsync()
         {
-            //Burada sadece veritabanından veri çekme (SELECT) kodu olacak.
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                const string sql = "SELECT * FROM Blog";
+
+                // QueryAsync IEnumerable döner, biz List istediğimiz için ToList() yapıyoruz.
+                var blogs = await connection.QueryAsync<Blog>(sql);
+                return blogs.ToList();
+            }
         }
 
-        public Task RemoveAsync(Guid id)
+
+
+        // DELETE: ID'ye göre silme
+        public async Task DeleteAsync(Guid id)
         {
-            //Burada sadece veritabanından veri silme (DELETE) kodu olacak
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                const string sql = @"DELETE FROM Blog WHERE BlogId = @id";
+                await connection.ExecuteAsync(sql, new { id });
+            }
         }
 
-        public Task UpdateAsync(Blog blog)
+
+
+        // UPDATE: Veri güncelleme
+        public async Task UpdateAsync(Blog blog)
         {
-            //Burada sadece veritabanından veri güncelleme (UPDATE) kodu olacak
-            throw new NotImplementedException();
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                const string sql = @"UPDATE Blog SET Title = @Title, Description = @Description, ImageUrl = @ImageUrl, CategoryId = @CategoryId, Slug = @Slug, IsPublished = @IsPublished WHERE BlogId = @BlogId";
+
+                //Dapper burada otomatik eşleme yapacak.
+                await connection.ExecuteAsync(sql, blog);
+            }
         }
 
     }

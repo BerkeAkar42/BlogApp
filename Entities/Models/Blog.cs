@@ -11,6 +11,7 @@ namespace Entities.Models
         public Guid BlogId { get; init; }
         public string? Title { get; set; }
         public string? Description { get; set; }
+        public string? Content { get; set; }
         public string? ImageUrl { get; set; }
         public int CategoryId { get; set; }
         public DateTime CreateDate { get; init; }

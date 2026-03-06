@@ -1,5 +1,7 @@
 using Repositories.Dapper;
 using Repositories.Contracts;
+using Services.Contracts;
+using Services.Services.BlogService;
 
 namespace API
 {
@@ -17,7 +19,12 @@ namespace API
 
 
             //Dependency Injection (DI) - Baðýmlýlýklarý azaltan, bir servis kaydý.
-            //builder.Services.AddScoped<IBlogRepository, BlogRepository>(); // "Sisteme þunu diyoruz: Biri senden IBlogRepository isterse, ona git BlogRepository'den bir tane örnek ver."
+            //"Sisteme þunu diyoruz: Biri senden Interface isterse, ona git Iplemente edilmiþ class'dan bir tane örnek ver."
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection"); //appsetting.json'daki Database Connection String'ini okuduk.
+            builder.Services.AddScoped<IBlogRepository>(sp => new BlogRepository(connectionString));
+
+            builder.Services.AddScoped<IBlogService, BlogService>(); //Servisi DI yaptýk.
 
 
             var app = builder.Build();
