@@ -11,8 +11,9 @@ namespace Services.Contracts
     {
         // Task çağıran bir metotun kendisi de task olmak zorundadır. Mantık şu, biri bana bir not verecek ama o not bana gelmeden ben sana not veremem bekliyorum demek gibi bir şeydir.
         public Task<IEnumerable<Blog>> GetAll();
+        public Task<Blog> GetOne(Guid? id);
         public Task Add(Blog blog);
         public Task Update(Blog blog);
-        public Task Delete(Guid id);
+        public Task Delete(Guid? id);
     }
 }

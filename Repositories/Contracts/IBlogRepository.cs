@@ -10,6 +10,7 @@ namespace Repositories.Contracts
     public interface IBlogRepository //Tüm blogların vt de işlem gördüğü interface
     {
         Task<List<Blog>> GetAllAsync();
+        Task<Blog> GetOneBlogByIdAsync(Guid id);
 
         Task AddAsync(Blog blog);
 

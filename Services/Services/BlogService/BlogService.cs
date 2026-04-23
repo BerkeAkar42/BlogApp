@@ -25,25 +25,25 @@ namespace Services.Services.BlogService
         public async Task Add(Blog blog)
         {
 
-            // 1. Validasyonlar (Zeka Katmanı)
-            if (string.IsNullOrWhiteSpace(blog.Title))
-                throw new Exception("Lütfen başlık giriniz!");
+            //// 1. Validasyonlar (Zeka Katmanı)
+            //if (string.IsNullOrWhiteSpace(blog.Title))
+            //    throw new Exception("Lütfen başlık giriniz!");
 
-            if (blog.Title.Length > 200)
-                throw new Exception("Başlık 200 karakterden fazla olamaz!");
+            //if (blog.Title.Length > 200)
+            //    throw new Exception("Başlık 200 karakterden fazla olamaz!");
 
-            if (string.IsNullOrWhiteSpace(blog.Description))
-                throw new Exception("Lütfen açıklama giriniz!");
+            //if (string.IsNullOrWhiteSpace(blog.Description))
+            //    throw new Exception("Lütfen açıklama giriniz!");
 
-            if (blog.Description.Length > 500)
-                throw new Exception("Açıklama 500 karakterden fazla olamaz!");
+            //if (blog.Description.Length > 500)
+            //    throw new Exception("Açıklama 500 karakterden fazla olamaz!");
 
 
-            // 2. Slug Üretimi
-            var slug = GenerateSlug(blog.Title);
+            //// 2. Slug Üretimi
+            //var slug = GenerateSlug(blog.Title);
 
-            if (!string.IsNullOrWhiteSpace(slug)) // Boş değilse ata!
-                blog.Slug = slug;
+            //if (!string.IsNullOrWhiteSpace(slug)) // Boş değilse ata!
+            //    blog.Slug = slug;
 
 
             await _repository.AddAsync(blog);
@@ -84,15 +84,18 @@ namespace Services.Services.BlogService
 
 
 
-        public Task Delete(Guid id)
+        public async Task Delete(Guid? id)
         {
-            throw new NotImplementedException();
+            if (!id.HasValue || id.Value == Guid.Empty)
+                throw new Exception("ID Değeri Boş Geçilemez.");
+
+            await _repository.DeleteAsync(id.Value);
         }
 
 
         public async Task<IEnumerable<Blog>> GetAll()
         {
-            //test API
+            
             var blogs = await _repository.GetAllAsync();
 
             if (blogs is null)
@@ -102,9 +105,37 @@ namespace Services.Services.BlogService
         }
 
 
-        public Task Update(Blog blog)
+        public async Task Update(Blog blog)
         {
-            throw new NotImplementedException();
+            if (blog is null)
+                throw new Exception("Veriler Servis Tarafına Gönderilirken Bir Hatayla Karşılaşıldı.");
+
+            //Db den gelen halihazırda olan veri.
+            var existingBlog = await GetOne(blog.BlogId);
+
+
+            existingBlog.Title = blog.Title;
+            existingBlog.Description = blog.Description;
+            existingBlog.Content = blog.Content;
+            existingBlog.IsPublished = blog.IsPublished;
+
+
+            await _repository.UpdateAsync(existingBlog);
         }
+
+        public async Task<Blog> GetOne(Guid? id)
+        {
+            if (!id.HasValue || id.Value == Guid.Empty)
+                throw new Exception("ID Değeri Boş Geçilemez.");
+
+            var blog = await _repository.GetOneBlogByIdAsync(id.Value);
+
+            if (blog is null)
+                throw new Exception("Veriler getirilirken bir sorun oluştu!");
+
+            return blog;
+        }
+
+       
     }
 }

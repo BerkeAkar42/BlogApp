@@ -19,19 +19,12 @@ namespace Repositories.Dapper
             _connectionString = connectionString;
         }
 
-
-
-        // var veriler = await depo.tümünüGetir();
-        //Bu await, veriler gelene kadar bekle ve veriler e ata.
-
-
-
         // INSERT: Yeni blog ekleme
         public async Task AddAsync(Blog blog)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                const string sql = @"INSERT INTO Blog (BlogId, Title, Description, Content, ImageUrl, CategoryId, CreateDate, Slug, IsPublished) VALUES (@BlogId, @Title, @Description, Content, @ImageUrl, @CategoryId, @CreateDate, @Slug, @IsPublished)";
+                const string sql = @"INSERT INTO Blog (BlogId, Title, Description, Content, CreateDate, IsPublished) VALUES (@BlogId, @Title, @Description, @Content, @CreateDate, @IsPublished)";
 
 
                 // Dapper, 'blog' nesnesindeki property isimlerini otomatik olarak '@' parametreleriyle eşleştirir.
@@ -52,6 +45,17 @@ namespace Repositories.Dapper
                 // QueryAsync IEnumerable döner, biz List istediğimiz için ToList() yapıyoruz.
                 var blogs = await connection.QueryAsync<Blog>(sql);
                 return blogs.ToList();
+            }
+        }
+
+        public async Task<Blog> GetOneBlogByIdAsync(Guid id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                const string sql = "SELECT * FROM Blog WHERE BlogId = @id";
+
+                var blog = await connection.QueryFirstOrDefaultAsync<Blog>(sql, new { id });
+                return blog;
             }
         }
 
@@ -81,5 +85,6 @@ namespace Repositories.Dapper
             }
         }
 
+        
     }
 }
