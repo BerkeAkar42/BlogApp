@@ -7,11 +7,11 @@ namespace API.Controllers
 {
     [Route("/blogapp.backend/api/[controller]")]
     [ApiController]
-    public class TestController : ControllerBase
+    public class BlogsController : ControllerBase
     {
         private readonly IBlogService _blogService;
 
-        public TestController(IBlogService blogService)
+        public BlogsController(IBlogService blogService)
         {
             _blogService = blogService;
         }

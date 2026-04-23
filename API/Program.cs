@@ -27,6 +27,22 @@ namespace API
             builder.Services.AddScoped<IBlogService, BlogService>(); //Servisi DI yaptýk.
 
 
+
+            // 1. CORS Politikasýný Tanýmla
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("ReactPolicy", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173") // React'in çalýþtýðý port 
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
+
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -34,6 +50,14 @@ namespace API
             {
                 app.MapOpenApi();
             }
+
+
+
+            // 2. CORS'u Aktif Et
+            app.UseCors("ReactPolicy");
+
+
+
 
             app.UseHttpsRedirection();
 
